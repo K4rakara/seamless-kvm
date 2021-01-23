@@ -17,6 +17,6 @@ package() {
   install -Dm755 "${srcdir}/../../src/service.sh"   "${pkgdir}/usr/bin/seamless-kvm-service";
   install -Dm755 "${srcdir}/../../src/start.sh"     "${pkgdir}/usr/bin/seamless-kvm-start";
   install -Dm664 "${srcdir}/../../src/example.json" "${pkgdir}/usr/share/doc/seamless-kvm/example.json";
-  install -Dm644 "${srcdir}/../../README"           "${pkgdir}/usr/share/doc/seamless-kvm/README";
+  install -Dm644 "${srcdir}/../../README.md"        "${pkgdir}/usr/share/doc/seamless-kvm/README.md";
   install -Dm644 "${srcdir}/../../src/unit.service" "${pkgdir}/etc/systemd/system/seamless-kvm.service";
 }
