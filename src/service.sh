@@ -268,11 +268,6 @@ take() {
 }
 
 ret() {
-  # TODO: Set up returning processes.
-  # Return services.
-  while read LINE; do
-    [[ "${LINE}" != "" ]] && systemctl start "${LINE}";
-  done <<< $(echo "${TAKEOVER_RETURN_SERVICES}");
   # Return VFIO.
   while read LINE; do
     if [[ "${LINE}" != "" ]]; then
@@ -281,6 +276,11 @@ ret() {
     fi;
   done <<< $(echo "${TAKEOVER_RETURN_VFIO}");
   echo "1" > "/sys/bus/pci/rescan";
+  # TODO: Set up returning processes.
+  # Return services.
+  while read LINE; do
+    [[ "${LINE}" != "" ]] && systemctl start "${LINE}";
+  done <<< $(echo "${TAKEOVER_RETURN_SERVICES}");
 }
 
 ### Set up signal handlers ###
