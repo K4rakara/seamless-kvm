@@ -1,0 +1,20 @@
+{
+  "takeover": {
+    "take": {
+      "process": [],
+      "service": [ "sddm.service" ]
+    },
+    "return": {
+      "process": [],
+      "service": [ "sddm.service" ]
+    }
+  },
+  "vms": {
+    "default": "endeavouros",
+    "endeavouros": {
+      "user": "user",
+      "exec": "/home/user/vms/endeavouros/boot",
+      "takeover": true
+    }
+  }
+}

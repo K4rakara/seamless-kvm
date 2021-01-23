@@ -1,0 +1,7 @@
+[Unit]
+Description=Seamlessly transitions from a Linux desktop to a KVM virtual machine.
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/env /usr/bin/seamless-kvm-service
