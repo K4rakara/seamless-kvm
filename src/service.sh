@@ -88,8 +88,10 @@ EXEC="";
 TAKEOVER=false;
 TAKEOVER_TAKE_PROCESSES="";
 TAKEOVER_TAKE_SERVICES="";
+TAKEOVER_TAKE_VFIO="";
 TAKEOVER_RETURN_PROCESSES="";
 TAKEOVER_RETURN_SERVICES="";
+TAKEOVER_RETURN_VFIO="";
 
 ### Load arguments file ###
 if [[ -f /tmp/seamless-kvm-args ]]; then
@@ -170,6 +172,26 @@ if [[ "${TAKEOVER}" ]]; then
         done <<< $(echo "${SERVICE}" | jq -r '.[] | type');
         TAKEOVER_TAKE_SERVICES="$(echo "${SERVICE}" | jq -r 'join("\n")')";
       fi;
+      VFIO="$(tjq "${TAKE}" '.vfio' '.vfio' 'true' 'array' 'null')";
+      if [[ ! -z "${VFIO}" ]]; then
+        while read LINE; do
+          if [[ "${LINE}" != "array" ]] && [[ "${LINE}" != "" ]]; then
+            printf "${ERROR} Invalid configuration: Expected ";
+            printf ".takeover.take.vfio[*] to be of type array, got ";
+            printf "value of type ${LINE}.\n";
+            exit 1;
+          fi;
+        done <<< $(echo "${VFIO}" | jq -r '.[] | type');
+        while read LINE; do
+          if [[ "${LINE}" != "string" ]] && [[ "${LINE}" != "" ]]; then
+            printf "${ERROR} Invalid configuration: Expected ";
+            printf ".takeover.take.vfio[*][*] to be of type string, got ";
+            printf "value of type ${LINE}.\n";
+            exit 1;
+          fi;
+        done <<< $(echo "${VFIO}" | jq -r '.[] | .[] | type');
+        TAKEOVER_TAKE_VFIO="$(echo "${SERVICE}" | jq -r 'map("\(.[0]) \(.[1])") | join("\n")')";
+      fi;
     fi;
     RETURN="$(tjq "${TAKEOVER_}" '.return' '.return' 'true' 'object' 'null')";
     if [[ ! -z "${RETURN}" ]]; then
@@ -197,25 +219,68 @@ if [[ "${TAKEOVER}" ]]; then
         done <<< $(echo "${SERVICE}" | jq -r '.[] | type');
         TAKEOVER_RETURN_SERVICES="$(echo "${SERVICE}" | jq -r 'join("\n")')";
       fi;
+      VFIO="$(tjq "${RETURN}" '.vfio' '.vfio' 'true' 'array' 'null')";
+      if [[ ! -z "${VFIO}" ]]; then
+        while read LINE; do
+          if [[ "${LINE}" != "array" ]] && [[ "${LINE}" != "" ]]; then
+            printf "${ERROR} Invalid configuration: Expected ";
+            printf ".takeover.return.vfio[*] to be of type array, got ";
+            printf "value of type ${LINE}.\n";
+            exit 1;
+          fi;
+        done <<< $(echo "${VFIO}" | jq -r '.[] | type');
+        while read LINE; do
+          if [[ "${LINE}" != "string" ]] && [[ "${LINE}" != "" ]]; then
+            printf "${ERROR} Invalid configuration: Expected ";
+            printf ".takeover.return.vfio[*][*] to be of type string, got ";
+            printf "value of type ${LINE}.\n";
+            exit 1;
+          fi;
+        done <<< $(echo "${VFIO}" | jq -r '.[] | .[] | type');
+        TAKEOVER_RETURN_VFIO="$(echo "${SERVICE}" | jq -r 'map("\(.[0]) \(.[1])") | join("\n")')";
+      fi;
     fi;
   fi;
 fi;
 
 ### Set up take and return handlers ###
 take() {
+  # Take processes.
   while read LINE; do
     [[ "${LINE}" != "" ]] && pkill "${LINE}";
   done <<< $(echo "${TAKEOVER_TAKE_PROCESSES}");
+  # Take services.
   while read LINE; do
     [[ "${LINE}" != "" ]] && systemctl stop "${LINE}";
   done <<< $(echo "${TAKEOVER_TAKE_SERVICES}");
+  # Take VFIO.
+  while read LINE; do
+    if [[ "${LINE}" != "" ]]; then
+      IFS=" " read -ra IDS <<< "${LINE}";
+      SPACE_SPLIT="$(echo ${IDS[1]} | tr ':' ' ')";
+
+      echo "${SPACE_SPLIT}" > "/sys/bus/pci/drivers/vfio-pci/new_id";
+      echo "${IDS[2]}"      > "/sys/bus/pci/devices/${IDS[2]}/driver/unbind";
+      echo "${IDS[2]}"      > "/sys/bus/pci/drivers/vfio-pci/bind";
+      echo "${SPACE_SPLIT}" > "/sys/bus/pci/drivers/vfio-pci/remove_id";
+    fi;
+  done <<< $(echo "${TAKEOVER_TAKE_VFIO}");
 }
 
 ret() {
   # TODO: Set up returning processes.
+  # Return services.
   while read LINE; do
     [[ "${LINE}" != "" ]] && systemctl start "${LINE}";
   done <<< $(echo "${TAKEOVER_RETURN_SERVICES}");
+  # Return VFIO.
+  while read LINE; do
+    if [[ "${LINE}" != "" ]]; then
+      IFS=" " read -ra IDS <<< "${LINE}";
+      echo "1" > "/sys/bus/pci/devices/${IDS[2]}/remove";
+    fi;
+  done <<< $(echo "${TAKEOVER_RETURN_VFIO}");
+  echo "1" > "/sys/bus/pci/rescan";
 }
 
 ### Set up signal handlers ###
