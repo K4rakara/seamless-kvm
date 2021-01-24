@@ -257,6 +257,8 @@ take() {
   # Take VFIO.
   while read LINE; do
     if [[ "${LINE}" != "" ]]; then
+      echo "ATTEMPTING TO UNBIND (${LINE})";
+
       IFS=" " read -ra IDS <<< "${LINE}";
       SPACE_SPLIT="$(echo ${IDS[1]} | tr ':' ' ')";
 
