@@ -302,10 +302,8 @@ trap gracefulexit SIGTERM SIGHUP;
 ### Take ###
 take;
 
-while true; do echo > /dev/null; sleep 1; done;
-
 ### Start up the VM and wait for it to exit ###
-#sudo --user "${USER_}" "${EXEC}";
+sudo --user "${USER_}" "${EXEC}";
 
 ### Return ###
 ret;
