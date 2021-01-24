@@ -174,6 +174,7 @@ if [[ "${TAKEOVER}" ]]; then
       fi;
       VFIO="$(tjq "${TAKE}" '.vfio' '.vfio' 'true' 'array' 'null')";
       if [[ ! -z "${VFIO}" ]]; then
+        echo "VFIO=${VFIO}";
         while read LINE; do
           if [[ "${LINE}" != "array" ]] && [[ "${LINE}" != "" ]]; then
             printf "${ERROR} Invalid configuration: Expected ";
@@ -190,7 +191,7 @@ if [[ "${TAKEOVER}" ]]; then
             exit 1;
           fi;
         done <<< $(echo "${VFIO}" | jq -r '.[] | .[] | type');
-        TAKEOVER_TAKE_VFIO="$(echo "${SERVICE}" | jq -r 'map("\(.[0]) \(.[1])") | join("\n")')";
+        TAKEOVER_TAKE_VFIO="$(echo "${VFIO}" | jq -r 'map("\(.[0]) \(.[1])") | join("\n")')";
       fi;
     fi;
     RETURN="$(tjq "${TAKEOVER_}" '.return' '.return' 'true' 'object' 'null')";
@@ -259,8 +260,6 @@ take() {
       IFS=" " read -ra IDS <<< "${LINE}";
       SPACE_SPLIT="$(echo ${IDS[1]} | tr ':' ' ')";
 
-      echo "Attempting to unbind (${IDS[1]} ${IDS[2]})";
-      
       echo "${SPACE_SPLIT}" > "/sys/bus/pci/drivers/vfio-pci/new_id";
       echo "${IDS[2]}" > "/sys/bus/pci/devices/${IDS[2]}/driver/unbind";
       echo "${IDS[2]}" > "/sys/bus/pci/drivers/vfio-pci/bind";
