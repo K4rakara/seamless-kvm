@@ -1,11 +1,11 @@
 #!/usr/bin/sh
 
 {
-  TO_WRITE="export ARG_N=${#};\n";
+  TO_WRITE="export ARG_N=${#};";
   
   I="$((1))";
   for ARG in "${@}"; do
-    TO_WRITE="${TO_WRITE}export ARG_${I}=\"${ARG}\";\n";
+    TO_WRITE="${TO_WRITE}export ARG_${I}=\"${ARG}\";";
     I="$((${I} + 1))";
   done;
 
