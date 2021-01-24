@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
 ### Utilities ###
 ANSI="\x1b[";
@@ -261,6 +261,10 @@ take() {
 
       IFS=" " read -ra IDS <<< "${LINE}";
       SPACE_SPLIT="$(echo ${IDS[1]} | tr ':' ' ')";
+
+      echo "${IDS}";
+      echo "${IDS[1]}";
+      echo "${IDS[2]}";
 
       echo "${SPACE_SPLIT}" > "/sys/bus/pci/drivers/vfio-pci/new_id";
       echo "${IDS[2]}" > "/sys/bus/pci/devices/${IDS[2]}/driver/unbind";
