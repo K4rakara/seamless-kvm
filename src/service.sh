@@ -128,7 +128,7 @@ load_specified() {
     NAME="${1}";
     USER_="$(tjq "${VM}" ".user" ".user // \"${USER}\"" "true" "string")";
     EXEC="$(tjq "${VM}" ".exec" ".exec // \"exit\"" "true" "string")";
-    TAKEOVER="$(tjq "${VM}" | ".takeover" ".takeover // false" "true" "boolean")";
+    TAKEOVER="$(tjq "${VM}" ".takeover" ".takeover // false" "true" "boolean")";
     TAKEOVER=[[ "${TAKEOVER}" == "true" ]];
   else
     printf "${WARN} The specified VM \"${1}\" does not exist. Attempting to "
