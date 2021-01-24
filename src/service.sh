@@ -238,7 +238,7 @@ if [[ "${TAKEOVER}" ]]; then
             exit 1;
           fi;
         done <<< $(echo "${VFIO}" | jq -r '.[] | .[] | type');
-        TAKEOVER_RETURN_VFIO="$(echo "${SERVICE}" | jq -r 'map("\(.[0]) \(.[1])") | join("\n")')";
+        TAKEOVER_RETURN_VFIO="$(echo "${VFIO}" | jq -r 'map("\(.[0]) \(.[1])") | join("\n")')";
       fi;
     fi;
   fi;
