@@ -109,14 +109,11 @@ load_default() {
   local DEFAULT="$(tjq "${CONFIG}" '.vms.default' '.vms.default' 'true' 'string' 'null')";
   if [[ ! -z "${DEFAULT}" ]]; then
     local VM="$(tjq "${CONFIG}" ".vms[\"${DEFAULT}\"]" ".vms[\"${DEFAULT}\"]" 'true' 'object' 'null')";
-    echo "VM=${VM}";
     if [[ ! -z "${VM}" ]]; then
       NAME="${DEFAULT}";
       USER_="$(tjq "${VM}" ".user" ".user // \"${USER}\"" "true" "string")";
       EXEC="$(tjq "${VM}" ".exec" ".exec // \"exit\"" "true" "string")";
-      echo "test?";
       TAKEOVER="$(tjq "${VM}" ".takeover" ".takeover // false" "true" "boolean")";
-      echo "test??";
       TAKEOVER=[[ "${TAKEOVER}" == "true" ]];
     else
       printf "${ERROR} The default VM \"${DEFAULT}\" does not exist. Unable to continue.\n";
@@ -147,7 +144,7 @@ load_specified() {
 
 # If the VM is configured to take over the system, load the relevant config.
 if [[ "${TAKEOVER}" ]]; then
-  TAKEOVER_="$(tjq "${TAKEOVER}" '.takeover' '.takeover' 'true' 'object' 'null')";
+  TAKEOVER_="$(tjq "${CONFIG}" '.takeover' '.takeover' 'true' 'object' 'null')";
   if [[ ! -z "${TAKEOVER_}" ]]; then
     TAKE="$(tjq "${TAKEOVER_}" '.take' '.take' 'true' 'object' 'null')";
     if [[ ! -z "${TAKE}" ]]; then
