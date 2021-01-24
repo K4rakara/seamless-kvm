@@ -109,6 +109,7 @@ load_default() {
   local DEFAULT="$(tjq "${CONFIG}" '.vms.default' '.vms.default' 'true' 'string' 'null')";
   if [[ ! -z "${DEFAULT}" ]]; then
     local VM="$(tjq "${CONFIG}" ".vms[\"${DEFAULT}\"]" ".vms[\"${DEFAULT}\"]" 'true' 'object' 'null')";
+    echo "VM=${VM}";
     if [[ ! -z "${VM}" ]]; then
       NAME="${DEFAULT}";
       USER_="$(tjq "${VM}" ".user" ".user // \"${USER}\"" "true" "string")";
