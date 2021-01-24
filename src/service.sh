@@ -114,7 +114,9 @@ load_default() {
       NAME="${DEFAULT}";
       USER_="$(tjq "${VM}" ".user" ".user // \"${USER}\"" "true" "string")";
       EXEC="$(tjq "${VM}" ".exec" ".exec // \"exit\"" "true" "string")";
+      echo "test?";
       TAKEOVER="$(tjq "${VM}" ".takeover" ".takeover // false" "true" "boolean")";
+      echo "test??";
       TAKEOVER=[[ "${TAKEOVER}" == "true" ]];
     else
       printf "${ERROR} The default VM \"${DEFAULT}\" does not exist. Unable to continue.\n";
