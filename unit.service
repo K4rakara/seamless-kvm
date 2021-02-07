@@ -1,0 +1,7 @@
+[Unit]
+Description=Seamless Kvm
+
+[Service]
+Type=Simple
+User=root
+ExecStart=/usr/bin/env /usr/bin/seamless-kvm-service
