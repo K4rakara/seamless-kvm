@@ -85,3 +85,9 @@ sudo seamless-kvm-start some-vm
     }
 }
 ```
+
+### Notes
+
+ - For some reason that I can't figure out, this tool cannot work with OVMF.
+ - Using the PCI rebinding feature requires running the VM as root, which isn't
+   always the best idea.
